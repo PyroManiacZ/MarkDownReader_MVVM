@@ -44,9 +44,11 @@ class MainActivity : ComponentActivity() {
                             elevation = 12.dp
                         )
                     },
-                    content = {
+                    content = { innerPadding ->
                         Surface(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
                             color = MaterialTheme.colors.background
                         ) {
                             MarkNavHost()
