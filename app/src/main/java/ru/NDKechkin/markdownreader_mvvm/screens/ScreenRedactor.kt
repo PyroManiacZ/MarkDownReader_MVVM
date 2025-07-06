@@ -4,9 +4,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import ru.NDKechkin.markdownreader_mvvm.Redactor.RedactorToolbarSimple
 import ru.NDKechkin.markdownreader_mvvm.VM.MarkdownViewModel
@@ -20,10 +24,16 @@ fun ScreenRedactor(
         mutableStateOf(TextFieldValue(text = viewModel.markdownText))
     }
 
+    val view = LocalView.current
+    val insets = remember {
+        ViewCompat.getRootWindowInsets(view)?.getInsets(WindowInsetsCompat.Type.systemBars())
+    }
+    val bottomPadding = with(LocalDensity.current) { (insets?.bottom ?: 0).toDp() }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = bottomPadding + 16.dp)
     ) {
         RedactorToolbarSimple(
             text = textFieldValue.text,
@@ -56,9 +66,11 @@ fun ScreenRedactor(
 
         Button(
             onClick = {
-                // Обновляем ViewModel только при сохранении, а не на каждый ввод
                 viewModel.updateMarkdown(textFieldValue.text)
-                navController.popBackStack()
+                navController.navigate("Preview_screen") {
+                    popUpTo("Add_screen") { inclusive = true }
+                    launchSingleTop = true
+                }
             },
             modifier = Modifier.fillMaxWidth()
         ) {

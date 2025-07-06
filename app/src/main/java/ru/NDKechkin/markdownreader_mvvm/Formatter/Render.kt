@@ -1,15 +1,19 @@
 package ru.NDKechkin.markdownreader_mvvm.Formatter
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 
 @Composable
 fun MarkdownRender(blocks: List<MarkdownBlock>) {
@@ -43,8 +47,25 @@ fun MarkdownRender(blocks: List<MarkdownBlock>) {
                     )
                 }
                 is MarkdownBlock.Image -> {
-                    Text("[Image: ${block.alt}]")
-                    Spacer(Modifier.height(8.dp))
+                    // Загружаем и показываем изображение из URL
+                    val painter = rememberAsyncImagePainter(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(block.url)
+                            .crossfade(true)
+                            .build()
+                    )
+                    Image(
+                        painter = painter,
+                        contentDescription = block.alt,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp) // или адаптировать по необходимости
+                            .padding(vertical = 8.dp)
+                    )
+                    Text(
+                        text = block.alt,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
                 }
                 is MarkdownBlock.Table -> {
                     TableView(block.headers, block.rows)

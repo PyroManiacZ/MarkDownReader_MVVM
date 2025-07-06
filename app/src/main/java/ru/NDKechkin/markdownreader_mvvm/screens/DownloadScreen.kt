@@ -1,6 +1,7 @@
 package ru.NDKechkin.markdownreader_mvvm.screens
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -14,6 +15,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.NDKechkin.markdownreader_mvvm.Save.MarkdownFileSaver
 import ru.NDKechkin.markdownreader_mvvm.VM.MarkdownViewModel
 import java.net.HttpURLConnection
 import java.net.URL
@@ -124,6 +126,17 @@ fun DownloadScreen(navController: NavController, viewModel: MarkdownViewModel) {
                 navController.navigate("Add_screen")
             }) {
                 Text("Редактировать")
+            }
+            Button(
+                onClick = {
+                    val success = MarkdownFileSaver.saveMarkdownToDownloads(context, viewModel.markdownText)
+                    if (!success) {
+                        Toast.makeText(context, "Не удалось сохранить файл", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                enabled = viewModel.markdownText.isNotBlank()
+            ) {
+                Text("Сохранить файл в Downloads")
             }
         }
     }
